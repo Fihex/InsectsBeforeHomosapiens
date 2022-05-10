@@ -1,5 +1,9 @@
 {
   "item.ibh.test": "Test Item",
 
-  "itemGroup.ibhtab": "Insects Before Homosapiens"
+  "item.ibh.slim_spawn_egg": "Slim Spawn Egg",
+
+  "itemGroup.ibhtab": "Insects Before Homosapiens",
+
+  "sounds.ibh.lie": "Lie Sound"
 }
