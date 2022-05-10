@@ -23,6 +23,7 @@ public class InsectsBeforeHomosapiens
 {
     // Directly reference a slf4j logger
     public static final String MOD_ID = "ibh";
+    // Looger
     private static final Logger LOGGER = LogUtils.getLogger();
 
 
