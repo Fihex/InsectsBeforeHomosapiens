@@ -28,7 +28,7 @@ public class InsectsBeforeHomosapiens
 
     public InsectsBeforeHomosapiens()
     {
-        // Register the setup method for modloading
+        // Register the setup method for modloading just
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
         // Register ourselves for server and other game events we are interested in
