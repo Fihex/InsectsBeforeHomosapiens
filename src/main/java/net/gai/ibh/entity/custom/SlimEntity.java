@@ -2,19 +2,26 @@ package net.gai.ibh.entity.custom;
 
 import net.gai.ibh.sound.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -24,6 +31,8 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+
+import java.util.Random;
 
 public class SlimEntity extends Animal implements IAnimatable {
     private  AnimationFactory factory = new AnimationFactory(this);
@@ -55,6 +64,7 @@ public class SlimEntity extends Animal implements IAnimatable {
         return null;
     }
 
+    // START ANIMATION
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event){
         if (event.isMoving()){
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.slim.walk", true));
@@ -69,12 +79,12 @@ public class SlimEntity extends Animal implements IAnimatable {
         data.addAnimationController(new AnimationController(this, "controller",
                 0, this::predicate));
     }
-
+    // END ANIMATION
     @Override
     public AnimationFactory getFactory() {
         return this.factory;
     }
-    // SOUND EFFECTS
+    // START SOUND EFFECTS
     protected void playStepSound(BlockPos pos, BlockState blockIn) {
         this.playSound(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, 0.15F, 1.0F);
     }
@@ -94,4 +104,6 @@ public class SlimEntity extends Animal implements IAnimatable {
     protected float getSoundVolume() {
         return 0.2F;
     }
+    // END SOUND EFFECTS
+
 }

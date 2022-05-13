@@ -2,6 +2,10 @@
   "item.ibh.test": "Test Item",
 
   "item.ibh.slim_spawn_egg": "Slim Spawn Egg",
+  "item.ibh.fly_spawn_egg": "Fly Spawn Egg",
+
+  "entity.ibh.slim": "Slim",
+  "entity.ibh.fly": "Fly",
 
   "itemGroup.ibhtab": "Insects Before Homosapiens",
 

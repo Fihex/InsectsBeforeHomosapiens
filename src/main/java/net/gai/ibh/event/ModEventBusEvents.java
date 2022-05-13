@@ -2,6 +2,7 @@ package net.gai.ibh.event;
 
 import net.gai.ibh.InsectsBeforeHomosapiens;
 import net.gai.ibh.entity.ModEntityTypes;
+import net.gai.ibh.entity.custom.FlyEntity;
 import net.gai.ibh.entity.custom.SlimEntity;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,5 +13,6 @@ public class ModEventBusEvents {
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntityTypes.SLIM.get(), SlimEntity.setAttributes());
+        event.put(ModEntityTypes.FLY.get(), FlyEntity.setAttributes());
     }
 }

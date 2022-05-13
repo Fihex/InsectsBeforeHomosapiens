@@ -16,7 +16,10 @@ public class ModItems {
     public static final RegistryObject<Item> TEST = ITEMS.register("test", () -> new Item(new Item.Properties().tab(ModCreativeModeTab.IBH_TAB).stacksTo(16)));
 
     public static final RegistryObject<Item> SLIM_SPAWN_EGG = ITEMS.register("slim_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntityTypes.SLIM,0x948e8d, 0x3b3635,
+            () -> new ForgeSpawnEggItem(ModEntityTypes.SLIM,0xCC50C2, 0x4DCC7E,
+                    new Item.Properties().tab(ModCreativeModeTab.IBH_TAB)));
+    public static final RegistryObject<Item> FLY_SPAWN_EGG = ITEMS.register("fly_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntityTypes.FLY,0x31291e, 0xcc397b,
                     new Item.Properties().tab(ModCreativeModeTab.IBH_TAB)));
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);
