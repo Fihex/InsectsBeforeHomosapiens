@@ -20,11 +20,18 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -69,11 +76,15 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new PanicGoal(this, 1.25D));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.00, 10.0F,2.0F, true));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(6, new FlyEntity.FlyWanderGoal(this, 1.0D));
-        this.targetSelector.addGoal(7, (new HurtByTargetGoal(this)).setAlertOthers());
+        this.goalSelector.addGoal(4, new LeapAtTargetGoal(this, 0.4F));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
+        this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.00, 10.0F,2.0F, true));
+        this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(9, new FlyEntity.FlyWanderGoal(this, 1.0D));
+        this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
+        this.targetSelector.addGoal(3, (new HurtByTargetGoal(this)).setAlertOthers());
     }
 
     protected PathNavigation createNavigation(Level pLevel) {
@@ -120,6 +131,49 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController(this, "controller",
                 0, this::predicate));
+    }
+
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if (this.isInvulnerableTo(pSource)) {
+            return false;
+        } else {
+            Entity entity = pSource.getEntity();
+            if (!this.level.isClientSide) {
+                this.setOrderedToSit(false);
+            }
+
+            if (entity != null && !(entity instanceof Player) && !(entity instanceof AbstractArrow)) {
+                pAmount = (pAmount + 1.0F) / 2.0F;
+            }
+
+            return super.hurt(pSource, pAmount);
+        }
+    }
+
+    public boolean doHurtTarget(Entity pEntity) {
+        boolean flag = pEntity.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
+        if (flag) {
+            this.doEnchantDamageEffects(this, pEntity);
+        }
+
+        return flag;
+    }
+
+    public boolean wantsToAttack(LivingEntity pTarget, LivingEntity pOwner) {
+        if (!(pTarget instanceof Creeper) && !(pTarget instanceof Ghast)) {
+            if (pTarget instanceof FlyEntity) {
+                FlyEntity fly = (FlyEntity)pTarget;
+                return !fly.isTame() || fly.getOwner() != pOwner;
+            } else if (pTarget instanceof Player && pOwner instanceof Player && !((Player)pOwner).canHarmPlayer((Player)pTarget)) {
+                return false;
+            } else if (pTarget instanceof AbstractHorse && ((AbstractHorse)pTarget).isTamed()) {
+                return false;
+            } else {
+                return !(pTarget instanceof TamableAnimal) || !((TamableAnimal)pTarget).isTame();
+            }
+        } else {
+            return false;
+        }
     }
 
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
