@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.gai.ibh.entity.ModEntityTypes;
 import net.gai.ibh.entity.client.FlyRenderer;
 import net.gai.ibh.entity.client.SlimRenderer;
+import net.gai.ibh.entity.client.TestRenderer;
 import net.gai.ibh.item.ModItems;
 import net.gai.ibh.sound.ModSounds;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -55,6 +56,7 @@ public class InsectsBeforeHomosapiens
     {
         EntityRenderers.register(ModEntityTypes.SLIM.get(), SlimRenderer::new);
         EntityRenderers.register(ModEntityTypes.FLY.get(), FlyRenderer::new);
+        EntityRenderers.register(ModEntityTypes.TEST.get(), TestRenderer::new);
     }
 
     private void setup(final FMLCommonSetupEvent event)

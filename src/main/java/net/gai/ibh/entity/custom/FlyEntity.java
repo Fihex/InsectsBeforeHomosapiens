@@ -18,18 +18,23 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
+import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.Item;
@@ -59,7 +64,7 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
             SynchedEntityData.defineId(FlyEntity.class, EntityDataSerializers.BOOLEAN);
     public FlyEntity(EntityType<? extends TamableAnimal> entityType, Level worldIn) {
         super(entityType, worldIn);
-        this.moveControl = new FlyFlyingMoveControl(this, 100, true);
+        this.moveControl = new FlyFlyingMoveControl(this, 80, false);
     }
 
     public static AttributeSupplier setAttributes(){
@@ -67,7 +72,7 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
                 .add(Attributes.MAX_HEALTH, 2D)
                 .add(Attributes.ATTACK_DAMAGE, 1.0f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
-                .add(Attributes.FLYING_SPEED, 2.0D)
+                .add(Attributes.FLYING_SPEED, 4.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.5f).build();
     }
 
@@ -84,6 +89,10 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
         this.goalSelector.addGoal(9, new FlyEntity.FlyWanderGoal(this, 1.0D));
         this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
         this.targetSelector.addGoal(3, (new HurtByTargetGoal(this)).setAlertOthers());
     }
 
@@ -187,10 +196,6 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
     @Override
     public AnimationFactory getFactory() {
         return this.factory;
-    }
-
-    public void tick() {
-        super.tick();
     }
 
     public boolean causeFallDamage(float pFallDistance, float pMultiplier, DamageSource pSource) {
