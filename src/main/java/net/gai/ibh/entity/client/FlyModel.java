@@ -9,11 +9,20 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 public class FlyModel extends AnimatedGeoModel<FlyEntity> {
     @Override
     public ResourceLocation getModelLocation(FlyEntity object) {
+        if(object.isBaby())
+        {
+            return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/flyb.geo.json");
+        }
         return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/fly.geo.json");
+
     }
 
     @Override
     public ResourceLocation getTextureLocation(FlyEntity object) {
+        if(object.isBaby())
+        {
+            return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "textures/entity/fly/flyb.png");
+        }
         return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "textures/entity/fly/fly.png");
     }
 

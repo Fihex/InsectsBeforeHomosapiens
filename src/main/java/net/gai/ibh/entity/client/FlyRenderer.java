@@ -19,6 +19,10 @@ public class FlyRenderer extends GeoEntityRenderer<FlyEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(FlyEntity instance) {
+        if(instance.isBaby())
+        {
+            return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "textures/entity/fly/flyb.png");
+        }
         return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "textures/entity/fly/fly.png");
     }
 
@@ -26,7 +30,12 @@ public class FlyRenderer extends GeoEntityRenderer<FlyEntity> {
     public RenderType getRenderType(FlyEntity animatable, float partialTicks, PoseStack stack,
                                     MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn,
                                     ResourceLocation textureLocation) {
-        stack.scale(3.8F, 3.8F, 3.8F);
+        if(animatable.isBaby())
+        {
+            stack.scale(1.9F, 1.9F, 1.9F);
+        } else {
+            stack.scale(3.8F, 3.8F, 3.8F);
+        }
         return super.getRenderType(animatable, partialTicks, stack, renderTypeBuffer, vertexBuilder, packedLightIn, textureLocation);
     }
 }

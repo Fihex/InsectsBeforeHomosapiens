@@ -1,5 +1,7 @@
 package net.gai.ibh.entity.custom;
 
+import net.gai.ibh.entity.ModEntityTypes;
+import net.gai.ibh.item.ModItems;
 import net.gai.ibh.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -80,6 +82,7 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
         this.goalSelector.addGoal(1, new BreedGoal(this, 1.0D));
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new PanicGoal(this, 1.25D));
+        this.goalSelector.addGoal(3, new BreedGoal(this, 1.0D));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(4, new LeapAtTargetGoal(this, 0.4F));
         this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0D, true));
@@ -93,7 +96,7 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
-        this.targetSelector.addGoal(3, (new HurtByTargetGoal(this)).setAlertOthers());
+        this.targetSelector.addGoal(6, (new HurtByTargetGoal(this)).setAlertOthers());
     }
 
     protected PathNavigation createNavigation(Level pLevel) {
@@ -214,11 +217,21 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
         return !this.onGround;
     }
 
+    // Baby's part
+
     @Nullable
     @Override
-    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-        return null;
+    public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob mob) {
+        return ModEntityTypes.FLY.get().create(serverLevel);
     }
+
+    @Override
+    public boolean isFood(ItemStack pStack)
+    {
+        return pStack.getItem() == Items.ROTTEN_FLESH;
+    }
+
+    // End of baby's part
 
     static class FlyWanderGoal extends WaterAvoidingRandomFlyingGoal {
         public FlyWanderGoal(PathfinderMob p_186224_, double p_186225_) {
@@ -264,6 +277,12 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
         Item item = itemstack.getItem();
 
         Item itemForTaming = Items.APPLE;
+
+        //Baby's part
+        if(isFood(itemstack)){
+            return super.mobInteract(player, hand);
+        }
+        //End of baby's part
 
         if (item == itemForTaming && !isTame()) {
             if (this.level.isClientSide) {
