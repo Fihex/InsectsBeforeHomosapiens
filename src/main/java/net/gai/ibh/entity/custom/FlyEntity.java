@@ -1,8 +1,10 @@
 package net.gai.ibh.entity.custom;
 
 import net.gai.ibh.entity.ModEntityTypes;
+import net.gai.ibh.entity.variant.FlyVariant;
 import net.gai.ibh.item.ModItems;
 import net.gai.ibh.sound.ModSounds;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +16,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -44,6 +47,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,6 +68,8 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
     public static final int TICKS_PER_FLAP = Mth.ceil(1.4959966F);
     private static final EntityDataAccessor<Boolean> SITTING =
             SynchedEntityData.defineId(FlyEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> DATA_ID_TYPE_VARIANT =
+            SynchedEntityData.defineId(FlyEntity.class, EntityDataSerializers.INT);
     public FlyEntity(EntityType<? extends TamableAnimal> entityType, Level worldIn) {
         super(entityType, worldIn);
         this.moveControl = new FlyFlyingMoveControl(this, 80, false);
@@ -222,7 +228,10 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob mob) {
-        return ModEntityTypes.FLY.get().create(serverLevel);
+        FlyEntity baby = ModEntityTypes.FLY.get().create(serverLevel);
+        FlyVariant variant = Util.getRandom(FlyVariant.values(), this.random);
+        baby.setVariant(variant);
+        return baby;
     }
 
     @Override
@@ -322,18 +331,21 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         setSitting(tag.getBoolean("isSitting"));
+        this.entityData.set(DATA_ID_TYPE_VARIANT, tag.getInt("Variant"));
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("isSitting", this.isSitting());
+        tag.putInt("Variant", this.getTypeVariant());
     }
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(SITTING, false);
+        this.entityData.define(DATA_ID_TYPE_VARIANT, 0);
     }
 
     public void setSitting(boolean sitting) {
@@ -366,5 +378,25 @@ public class FlyEntity extends TamableAnimal implements IAnimatable, FlyingAnima
             getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(2D);
             getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.25f);
         }
+    }
+
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_146746_, DifficultyInstance p_146747_,
+                                        MobSpawnType p_146748_, @Nullable SpawnGroupData p_146749_,
+                                        @Nullable CompoundTag p_146750_) {
+        FlyVariant variant = Util.getRandom(FlyVariant.values(), this.random);
+        setVariant(variant);
+        return super.finalizeSpawn(p_146746_, p_146747_, p_146748_, p_146749_, p_146750_);
+    }
+
+    public FlyVariant getVariant() {
+        return FlyVariant.byId(this.getTypeVariant() & 255);
+    }
+
+    private int getTypeVariant() {
+        return this.entityData.get(DATA_ID_TYPE_VARIANT);
+    }
+
+    private void setVariant(FlyVariant variant) {
+        this.entityData.set(DATA_ID_TYPE_VARIANT, variant.getId() & 255);
     }
 }
