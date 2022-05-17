@@ -17,6 +17,20 @@ import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 import java.util.Map;
 
 public class FlyRenderer extends GeoEntityRenderer<FlyEntity> {
+    public static final Map<FlyVariant, ResourceLocation> LOCATION_BY_MODEL_VARIANT =
+            Util.make(Maps.newEnumMap(FlyVariant.class), (p_114874_) -> {
+                p_114874_.put(FlyVariant.DEFAULT,
+                        new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/fly.geo.json"));
+                p_114874_.put(FlyVariant.BLUE,
+                        new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/fly2.geo.json"));
+            });
+    public static final Map<FlyVariant, ResourceLocation> LOCATION_BY_BABY_MODEL_VARIANT =
+            Util.make(Maps.newEnumMap(FlyVariant.class), (p_114874_) -> {
+                p_114874_.put(FlyVariant.DEFAULT,
+                        new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/flyb.geo.json"));
+                p_114874_.put(FlyVariant.BLUE,
+                        new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/fly2b.geo.json"));
+            });
     public static final Map<FlyVariant, ResourceLocation> LOCATION_BY_VARIANT =
             Util.make(Maps.newEnumMap(FlyVariant.class), (p_114874_) -> {
                 p_114874_.put(FlyVariant.DEFAULT,

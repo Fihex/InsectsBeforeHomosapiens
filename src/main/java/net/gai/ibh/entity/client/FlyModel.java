@@ -11,9 +11,9 @@ public class FlyModel extends AnimatedGeoModel<FlyEntity> {
     public ResourceLocation getModelLocation(FlyEntity object) {
         if(object.isBaby())
         {
-            return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/flyb.geo.json");
+            return FlyRenderer.LOCATION_BY_BABY_MODEL_VARIANT.get(object.getVariant());
         }
-        return new ResourceLocation(InsectsBeforeHomosapiens.MOD_ID, "geo/fly.geo.json");
+        return FlyRenderer.LOCATION_BY_MODEL_VARIANT.get(object.getVariant());
 
     }
 
